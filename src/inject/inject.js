@@ -19,11 +19,13 @@ chrome.extension.sendMessage({ type: 'getTabId' }, function(res) {
     if (localStorage.getItem(save_address) != null) {
         queue = JSON.parse(localStorage[save_address]);
     }
-    // Add code to delete previous unused data
+    // TODO: Add code to delete previous unused data
     // for ( var i = 0, len = localStorage.length; i < len; ++i ) {
     //   console.log(localStorage.key(i).substring(0,11));
     // }
     console.log(save_address, "from sendMessage", queue);
+    // At the very start add the buttons
+    insertButton();
 });
 
 
@@ -43,6 +45,10 @@ function insertButton() {
             }
         }
     }
+    sendLink();
+}
+
+function insertPlayInfo() {
     if (window.queue.length > 0) {
         tmp = 'p[data-name="';
         tmp = tmp.concat(window.queue[0]);
@@ -52,11 +58,24 @@ function insertButton() {
             console.log(next_song);
             next_song[0].innerHTML = '<a href="#" style="color: blue"><i>Playing Next</i></a>';
         }
+        for (var i = 1; i < window.queue.length; ++i) {
+            tmp = 'p[data-name="';
+            tmp = tmp.concat(window.queue[i]);
+            tmp = tmp.concat('"');
+            var que_song = document.querySelectorAll(tmp);
+            if (que_song.length > 0) {
+                var tmp = '<a href="" style="color: blue"><i>In Queue at #';
+                tmp = tmp.concat(i.toString(), '</i></a>');
+                que_song[0].innerHTML = tmp;
+            }      
+        }
     }
-    function clickHandler(e){
-        window.queue.push(this.parentNode.dataset.name);
-        sendLink();
-    }
+}
+
+
+function clickHandler(e){
+    window.queue.push(this.parentNode.dataset.name);
+    sendLink();
 }
 
 function sendLink() {
@@ -68,13 +87,10 @@ function sendLink() {
         document.documentElement.appendChild(script);
         script.remove();
     }
+    insertPlayInfo();
 }
 
 
-// At the very start add the buttons
-insertButton();
-
-var port = chrome.runtime.connect();
 
 // YouTube is lesser prone to disturbances than sadness
 window.addEventListener("message", function(event) {
@@ -84,9 +100,7 @@ window.addEventListener("message", function(event) {
 
   if (event.data.type && (event.data.type == "FROM_PAGE")) {
     insertButton();
-    sendLink();
     console.log(window.queue);
-    console.log("Content script received: " + event.data.text);
     if (event.data.text == "pop") {
         window.queue.shift();
         console.log("Removed");
@@ -100,6 +114,7 @@ window.addEventListener("message", function(event) {
 }, false);
 
 // Delete the queue if tab is closed
+// But this code creates alert
 // window.onbeforeunload = function() 
 // {
 //     chrome.storage.local.clear();
