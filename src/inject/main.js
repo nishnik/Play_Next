@@ -1,5 +1,7 @@
 player = document.getElementById('movie_player');
-player.addEventListener("onStateChange", "onPlayerStateChanged");
+
+if (player)
+    player.addEventListener("onStateChange", "onPlayerStateChanged");
 
 var link = "nothing";
 

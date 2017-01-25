@@ -19,7 +19,7 @@
   ],
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/watch*"],
+      "matches": ["*://*.youtube.com/*"],
       "css": ["src/inject/inject.css"],
       "js": ["src/inject/inject.js"]
     }

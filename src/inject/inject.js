@@ -9,53 +9,62 @@
     document.documentElement.appendChild(s)
 })(window.document);
 
+var to_match = 'a[class="';
+if (document.location.href == "https://www.youtube.com/") {
+    to_match = to_match.concat(" yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+}
+else if (document.location.href.substring(0, 29) == "https://www.youtube.com/watch") {
+    to_match = to_match.concat(" content-link spf-link  yt-uix-sessionlink      spf-link ", '"]');
+}
+else if (document.location.href.substring(0, 31) == "https://www.youtube.com/results") {
+    to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+}
+
 var queue = [];
-var tabId;
 var save_address = 'songs_queue';
-chrome.extension.sendMessage({ type: 'getTabId' }, function(res) {
-    tabId = res.tabId;
-    console.log(tabId);
-    save_address = save_address.concat(tabId.toString());
-    if (localStorage.getItem(save_address) != null) {
-        queue = JSON.parse(localStorage[save_address]);
-    }
-    // TODO: Add code to delete previous unused data
-    // for ( var i = 0, len = localStorage.length; i < len; ++i ) {
-    //   console.log(localStorage.key(i).substring(0,11));
-    // }
-    console.log(save_address, "from sendMessage", queue);
-    // At the very start add the buttons
-    insertButton();
-});
+if (localStorage.getItem(save_address) != null) {
+    queue = JSON.parse(localStorage[save_address]);
+}
+
+// At the very start add the buttons
+insertButton();
 
 
 function insertButton() {
     var buttons = document.querySelectorAll('p[class="button play-next"]');
-    if (buttons.length == 0) {
-        var download_links = document.querySelectorAll('a[class=" content-link spf-link  yt-uix-sessionlink      spf-link "]');
-        if(download_links.length){
-            for (var i = 0; i < download_links.length; i++) {
-                var link = download_links[i];
-                var p = document.createElement('p');
-                p.innerHTML = '<a href="#"><i>Play Next</i></a>';
-                p.className = "button play-next";
-                link.parentElement.insertAdjacentElement('afterbegin',p);
-                p.dataset.name = link.href;
-                p.querySelector('a').addEventListener('click',clickHandler,true);
+    var download_links = document.querySelectorAll(to_match);
+    if(download_links.length != buttons.length){
+        // TODO: check if we iterate in reverse manner, can we exit the loop soon (only one check)
+        for (var i = 0; i < download_links.length; ++i) {
+            var link = download_links[i];
+            var to_insert = true;
+            for (var j = 0; j < buttons.length; ++i) {
+                var button = buttons[j];
+                if (button.dataset.name == link.href) {
+                    to_insert = false;
+                    break;
+                }
             }
+            if (to_insert == false)
+                continue;
+            var p = document.createElement('p');
+            p.innerHTML = '<a href="#"><i>Play Next</i></a>';
+            p.className = "button play-next";
+            link.parentElement.insertAdjacentElement('afterbegin',p);
+            p.dataset.name = link.href;
+            p.querySelector('a').addEventListener('click',clickHandler,true);
         }
     }
     sendLink();
 }
 
-function insertPlayInfo() {
+function insertPlayInfo() { // only called by sendLink
     if (window.queue.length > 0) {
         tmp = 'p[data-name="';
         tmp = tmp.concat(window.queue[0]);
         tmp = tmp.concat('"');
         var next_song = document.querySelectorAll(tmp);
         if (next_song.length > 0) {
-            console.log(next_song);
             next_song[0].innerHTML = '<a href="#" style="color: blue"><i>Playing Next</i></a>';
         }
         for (var i = 1; i < window.queue.length; ++i) {
@@ -74,14 +83,18 @@ function insertPlayInfo() {
 
 
 function clickHandler(e){
+    // update queue
+    if (localStorage.getItem(save_address) != null) {
+        queue = JSON.parse(localStorage[save_address]);
+    }
     window.queue.push(this.parentNode.dataset.name);
+    localStorage[save_address] = JSON.stringify(window.queue);
     sendLink();
 }
 
 function sendLink() {
     if (queue.length > 0) {
         var codeToPush = `var link = "${ window.queue[0] }";`;
-        console.log("sendLink", codeToPush);
         var script = document.createElement('script');
         script.textContent = codeToPush;
         document.documentElement.appendChild(script);
@@ -99,25 +112,14 @@ window.addEventListener("message", function(event) {
     return;
 
   if (event.data.type && (event.data.type == "FROM_PAGE")) {
+    if (localStorage.getItem(save_address) != null) {
+        queue = JSON.parse(localStorage[save_address]);
+    }
     insertButton();
     console.log(window.queue);
     if (event.data.text == "pop") {
         window.queue.shift();
-        console.log("Removed");
-        if (queue.length > 0) {
-            console.log(save_address);
-            localStorage[save_address] = JSON.stringify(window.queue);
-            console.log("Written");
-        }    
+        localStorage[save_address] = JSON.stringify(window.queue);
     }
   }
 }, false);
-
-// Delete the queue if tab is closed
-// But this code creates alert
-// window.onbeforeunload = function() 
-// {
-//     chrome.storage.local.clear();
-//     console.log("deleted");
-//     return '';
-// };
