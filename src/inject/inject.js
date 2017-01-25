@@ -6,41 +6,48 @@
         this.parentNode.removeChild(this);
         s = undefined
     };
-    console.log("Added script");
     document.documentElement.appendChild(s)
 })(window.document);
 
 var queue = [];
-
+chrome.storage.local.get('queue', function (result) {
+    queue = result.queue;
+    console.log(queue);
+});
+    
 function insertButton() {
-    console.log("insertButton act");
     var buttons = document.querySelectorAll('p[class="button play-next"]');
-    console.log(buttons.length);
     if (buttons.length == 0) {
         var download_links = document.querySelectorAll('a[class=" content-link spf-link  yt-uix-sessionlink      spf-link "]');
-        console.log(download_links.length);
         if(download_links.length){
-        	for (var i = 0; i < download_links.length; i++) {
-        		var link = download_links[i];
-        		var p = document.createElement('p');
-        			p.innerHTML = '<a href="#">Play Next</a>';
-        			p.className = "button play-next";
-        			link.parentElement.insertAdjacentElement('afterbegin',p);
-        			p.dataset.name = link.href;
-        			p.querySelector('a').addEventListener('click',clickHandler,true);
-        	}
+            for (var i = 0; i < download_links.length; i++) {
+                var link = download_links[i];
+                var p = document.createElement('p');
+                    p.innerHTML = '<a href="#">Play Next</a>';
+                    p.className = "button play-next";
+                    link.parentElement.insertAdjacentElement('afterbegin',p);
+                    p.dataset.name = link.href;
+                    p.querySelector('a').addEventListener('click',clickHandler,true);
+            }
         }
     }
 }
 
+function sendLink() {
+    if (queue.length > 0) {
+        var codeToPush = `var link = "${ window.queue[0] }";`;
+        console.log("sendLink", codeToPush);
+        var script = document.createElement('script');
+        script.textContent = codeToPush;
+        document.documentElement.appendChild(script);
+        script.remove();
+    }
+}
+
+
 function clickHandler(e){
     window.queue.push(this.parentNode.dataset.name);
-    var codeToPush = `var queue = "${ window.queue }";`;
-    console.log(codeToPush);
-    var script = document.createElement('script');
-    script.textContent = actualCode;
-    document.documentElement.appendChild(script);
-    script.remove();
+    sendLink();
 }
 // At the very start add the buttons
 insertButton();
@@ -55,10 +62,14 @@ window.addEventListener("message", function(event) {
 
   if (event.data.type && (event.data.type == "FROM_PAGE")) {
     insertButton();
+    sendLink();
     console.log(window.queue);
     console.log("Content script received: " + event.data.text);
-    if (event.data.text == "0") {
-        window.open(link,"_self");
+    if (event.data.text == "pop") {
+        window.queue.shift();
+        console.log("Removed");
+        chrome.storage.local.set({'queue': window.queue});    
+        console.log("Written");    
     }
   }
 }, false);
