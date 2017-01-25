@@ -9,6 +9,9 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  // "browser_action": {
+  //   "default_popup": "popup.html"
+  // },
   "default_locale": "en",
   "permissions": [
     "tabs",
@@ -16,7 +19,7 @@
   ],
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*"],
+      "matches": ["*://*.youtube.com/watch*"],
       "css": ["src/inject/inject.css"],
       "js": ["src/inject/inject.js"]
     }

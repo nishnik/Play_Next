@@ -10,10 +10,9 @@
 })(window.document);
 
 var queue = [];
-chrome.storage.local.get('queue', function (result) {
-    queue = result.queue;
-    console.log(queue);
-});
+// chrome.storage.local.get('queue', function (result) {
+//     queue = result.queue;
+// });
     
 function insertButton() {
     var buttons = document.querySelectorAll('p[class="button play-next"]');
@@ -23,13 +22,25 @@ function insertButton() {
             for (var i = 0; i < download_links.length; i++) {
                 var link = download_links[i];
                 var p = document.createElement('p');
-                    p.innerHTML = '<a href="#">Play Next</a>';
-                    p.className = "button play-next";
-                    link.parentElement.insertAdjacentElement('afterbegin',p);
-                    p.dataset.name = link.href;
-                    p.querySelector('a').addEventListener('click',clickHandler,true);
+                p.innerHTML = '<a href="#"><i>Play Next</i></a>';
+                p.className = "button play-next";
+                link.parentElement.insertAdjacentElement('afterbegin',p);
+                p.dataset.name = link.href;
+                p.querySelector('a').addEventListener('click',clickHandler,true);
             }
         }
+    }
+    if (window.queue.length > 0) {
+        tmp = 'p[data-name="';
+        tmp = tmp.concat(window.queue[0]);
+        tmp = tmp.concat('"');
+        var next_song = document.querySelectorAll(tmp);
+        next_song[0].innerHTML = '<a href="#" style="color: blue"><i>Playing Next</i></a>';
+        console.log(next_song);
+    }
+    function clickHandler(e){
+        window.queue.push(this.parentNode.dataset.name);
+        sendLink();
     }
 }
 
@@ -45,10 +56,6 @@ function sendLink() {
 }
 
 
-function clickHandler(e){
-    window.queue.push(this.parentNode.dataset.name);
-    sendLink();
-}
 // At the very start add the buttons
 insertButton();
 
@@ -68,8 +75,18 @@ window.addEventListener("message", function(event) {
     if (event.data.text == "pop") {
         window.queue.shift();
         console.log("Removed");
-        chrome.storage.local.set({'queue': window.queue});    
-        console.log("Written");    
+        if (queue.length > 0) {
+            chrome.storage.local.set({'queue': window.queue});    
+            console.log("Written");
+        }    
     }
   }
 }, false);
+
+// Delete the queue if tab is closed
+// window.onbeforeunload = function() 
+// {
+//     chrome.storage.local.clear();
+//     console.log("deleted");
+//     return '';
+// };
