@@ -10,10 +10,23 @@
 })(window.document);
 
 var queue = [];
-// chrome.storage.local.get('queue', function (result) {
-//     queue = result.queue;
-// });
-    
+var tabId;
+var save_address = 'songs_queue';
+chrome.extension.sendMessage({ type: 'getTabId' }, function(res) {
+    tabId = res.tabId;
+    console.log(tabId);
+    save_address = save_address.concat(tabId.toString());
+    if (localStorage.getItem(save_address) != null) {
+        queue = JSON.parse(localStorage[save_address]);
+    }
+    // Add code to delete previous unused data
+    // for ( var i = 0, len = localStorage.length; i < len; ++i ) {
+    //   console.log(localStorage.key(i).substring(0,11));
+    // }
+    console.log(save_address, "from sendMessage", queue);
+});
+
+
 function insertButton() {
     var buttons = document.querySelectorAll('p[class="button play-next"]');
     if (buttons.length == 0) {
@@ -35,8 +48,10 @@ function insertButton() {
         tmp = tmp.concat(window.queue[0]);
         tmp = tmp.concat('"');
         var next_song = document.querySelectorAll(tmp);
-        next_song[0].innerHTML = '<a href="#" style="color: blue"><i>Playing Next</i></a>';
-        console.log(next_song);
+        if (next_song.length > 0) {
+            console.log(next_song);
+            next_song[0].innerHTML = '<a href="#" style="color: blue"><i>Playing Next</i></a>';
+        }
     }
     function clickHandler(e){
         window.queue.push(this.parentNode.dataset.name);
@@ -76,7 +91,8 @@ window.addEventListener("message", function(event) {
         window.queue.shift();
         console.log("Removed");
         if (queue.length > 0) {
-            chrome.storage.local.set({'queue': window.queue});    
+            console.log(save_address);
+            localStorage[save_address] = JSON.stringify(window.queue);
             console.log("Written");
         }    
     }
