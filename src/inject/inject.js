@@ -1,27 +1,14 @@
-(function(document) {
-    "use strict";
-    var s = document.createElement("script");
-    s.src = chrome.extension.getURL("src/inject/main.js");
-    s.onload = function() {
-        this.parentNode.removeChild(this);
-        s = undefined
-    };
-    document.documentElement.appendChild(s)
-})(window.document);
-
-var to_match = 'a[class="';
-var LOC_HREF = 0;
-if (document.location.href == "https://www.youtube.com/") {
-    to_match = to_match.concat(" yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
-    LOC_HREF = 1;
-}
-else if (document.location.href.substring(0, 29) == "https://www.youtube.com/watch") {
-    to_match = to_match.concat(" content-link spf-link  yt-uix-sessionlink      spf-link ", '"]');
-    LOC_HREF = 2;
-}
-else if (document.location.href.substring(0, 31) == "https://www.youtube.com/results") {
-    to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
-    LOC_HREF = 3;
+function insert_main() {
+    (function(document) {
+        "use strict";
+        var s = document.createElement("script");
+        s.src = chrome.extension.getURL("src/inject/main.js");
+        s.onload = function() {
+            this.parentNode.removeChild(this);
+            s = undefined
+        };
+        document.documentElement.appendChild(s)
+    })(window.document);
 }
 
 var queue = [];
@@ -30,11 +17,25 @@ if (localStorage.getItem(save_address) != null) {
     queue = JSON.parse(localStorage[save_address]);
 }
 
+insert_main();
 // At the very start add the buttons
 insertButton();
 
-
 function insertButton() {
+    var to_match = 'a[class="';
+    var LOC_HREF = 0;
+    if (document.location.href == "https://www.youtube.com/") {
+        to_match = to_match.concat(" yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+        LOC_HREF = 1;
+    }
+    else if (document.location.href.substring(0, 29) == "https://www.youtube.com/watch") {
+        to_match = to_match.concat(" content-link spf-link  yt-uix-sessionlink      spf-link ", '"]');
+        LOC_HREF = 2;
+    }
+    else if (document.location.href.substring(0, 31) == "https://www.youtube.com/results") {
+        to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+        LOC_HREF = 3;
+    }
     var buttons = document.querySelectorAll('p[class="button play-next"]');
     var download_links = document.querySelectorAll(to_match);
     if(download_links.length != buttons.length){
@@ -47,7 +48,7 @@ function insertButton() {
             p.dataset.name = link.href;
             if (LOC_HREF == 2)
                 p.dataset.song_name = link.querySelectorAll('span[class="title"]')[0].innerText;
-            if (LOC_HREF == 1)
+            if (LOC_HREF == 1 || LOC_HREF == 3)
                 p.dataset.song_name = link.innerText;
             p.querySelector('a').addEventListener('click',clickHandler,true);
         }
@@ -137,6 +138,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     if (localStorage.getItem(save_address) != null) {
         window.queue = JSON.parse(localStorage[save_address]);
     }
+    insert_main();
+    insertButton();
 
     // Collect the necessary data 
     // (For your specific requirements `document.querySelectorAll(...)`

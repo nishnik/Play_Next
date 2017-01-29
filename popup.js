@@ -3,6 +3,7 @@
  //                     chrome.tabs.sendMessage(tabs[0].id, {message: "hello"});});
 
 function setDOMInfo(info) {
+	console.log(info);
     var queue = JSON.parse(info);
     console.log(queue);
   //   for (var i = 0; i <= queue.length; ++i) {
