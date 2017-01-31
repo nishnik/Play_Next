@@ -1,8 +1,10 @@
-player = document.getElementById('movie_player');
-
-if (player)
-    player.addEventListener("onStateChange", "onPlayerStateChanged");
-
+function run_now() {
+	if (player == document.getElementById('movie_player'))
+		return;
+	player = document.getElementById('movie_player');
+	player.addEventListener("onStateChange", "onPlayerStateChanged");
+}
+run_now();
 var link = "nothing";
 
 function onPlayerStateChanged(newState) {
@@ -19,6 +21,3 @@ function onPlayerStateChanged(newState) {
     }
 }
 
-window.onbeforeunload = function(e) {
-  console.log("from main");
-};

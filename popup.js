@@ -19,5 +19,3 @@ window.addEventListener('DOMContentLoaded', function () {
         setDOMInfo);
   });
 });
-
-window.postMessage({ type: "FROM_PAGE", text: "popup" }, "*");

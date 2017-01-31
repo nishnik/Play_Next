@@ -36,6 +36,10 @@ function insertButton() {
         to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
         LOC_HREF = 3;
     }
+    else if (document.location.href == "https://www.youtube.com/feed/trending") {
+        to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+        LOC_HREF = 4;
+    }
     var buttons = document.querySelectorAll('p[class="button play-next"]');
     var download_links = document.querySelectorAll(to_match);
     if(download_links.length != buttons.length){
@@ -48,7 +52,7 @@ function insertButton() {
             p.dataset.name = link.href;
             if (LOC_HREF == 2)
                 p.dataset.song_name = link.querySelectorAll('span[class="title"]')[0].innerText;
-            if (LOC_HREF == 1 || LOC_HREF == 3)
+            if (LOC_HREF == 1 || LOC_HREF == 3 || LOC_HREF == 4)
                 p.dataset.song_name = link.innerText;
             p.querySelector('a').addEventListener('click',clickHandler,true);
         }
@@ -144,7 +148,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 
 document.addEventListener("spfdone", process);
 function process() {
-    console.log("from in");
     insert_main();
     insertButton();
 }
