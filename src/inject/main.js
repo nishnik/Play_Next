@@ -18,3 +18,7 @@ function onPlayerStateChanged(newState) {
         window.open(link,"_self");
     }
 }
+
+window.onbeforeunload = function(e) {
+  console.log("from main");
+};

@@ -26,8 +26,5 @@
  ],
   "web_accessible_resources": [
         "src/inject/main.js"
-    ],
-  "background":{
-      "scripts":["background.js"]
-  }
+    ]
 }

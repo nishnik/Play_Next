@@ -122,16 +122,6 @@ window.addEventListener("message", function(event) {
 }, false);
 
 
-// tmp();
-// function tmp() {
-//     console.log("in tmp())");
-// var tabId;
-// chrome.extension.sendMessage({ type: 'getTabId' }, function(res) {
-//     tabId = res.tabId;
-//     console.log(tabId);
-// });
-// }
-
 chrome.runtime.onMessage.addListener(function (msg, sender, response) {
   // First, validate the message's structure
   if ((msg.from === 'popup') && (msg.subject === 'DOMInfo')) {
@@ -141,13 +131,20 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     insert_main();
     insertButton();
 
-    // Collect the necessary data 
-    // (For your specific requirements `document.querySelectorAll(...)`
-    //  should be equivalent to jquery's `$(...)`)
-    var domInfo = JSON.stringify(window.queue);
-
+    var domInfo = " ";
+    for (var i = 0; i < window.queue.length; ++i) {
+        domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", window.queue[i][1], "</a><br/><br/>");
+    }
     // Directly respond to the sender (popup), 
     // through the specified callback */
     response(domInfo);
   }
 });
+
+
+document.addEventListener("spfdone", process);
+function process() {
+    console.log("from in");
+    insert_main();
+    insertButton();
+}
