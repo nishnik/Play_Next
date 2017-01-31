@@ -80,6 +80,14 @@ function insertPlayInfo() { // only called by sendLink
                 que_song[0].innerHTML = tmp;
             }      
         }
+        // TODO: change the next button icon
+        // var next_button = document.querySelectorAll('a[class="ytp-next-button ytp-button"]');
+        // if (next_button.length > 0) {
+        //     console.log(next_button);
+        //         console.log("hello")
+        //         next_button[0].dataset.preview = "https://i.ytimg.com/vi/" + window.queue[0][0].substring(30) + "/hqdefault.jpg?custom=true&w=320&h=180&stc=true&jpg444=true&jpgq=90&sp=68&sigh=NZZP4Vcuwk4EsQsZgP-YAPOp0nM";
+        //         next_button[0].href = window.queue[0][0];
+        // }
     }
 }
 
@@ -145,7 +153,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
   }
 });
 
-
+// YouTube specific transition
 document.addEventListener("spfdone", process);
 function process() {
     insert_main();
