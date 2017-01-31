@@ -12,7 +12,6 @@
   "browser_action": {
     "default_popup": "popup.html"
   },
-  "default_locale": "en",
   "permissions": [
     "tabs",
     "storage"

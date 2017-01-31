@@ -57,10 +57,10 @@ function insertButton() {
             p.querySelector('a').addEventListener('click',clickHandler,true);
         }
     }
-    sendLink();
+    insertPlayInfo();
 }
 
-function insertPlayInfo() { // only called by sendLink
+function insertPlayInfo() {
     if (window.queue.length > 0) {
         tmp = 'p[data-name="';
         tmp = tmp.concat(window.queue[0][0]);
@@ -99,40 +99,8 @@ function clickHandler(e){
     }
     window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name]);
     localStorage[save_address] = JSON.stringify(window.queue);
-    sendLink();
-}
-
-function sendLink() {
-    if (queue.length > 0) {
-        var codeToPush = `var link = "${ window.queue[0][0] }";`;
-        var script = document.createElement('script');
-        script.textContent = codeToPush;
-        document.documentElement.appendChild(script);
-        script.remove();
-    }
     insertPlayInfo();
 }
-
-// YouTube is lesser prone to disturbances than sadness
-window.addEventListener("message", function(event) {
-  // Only accept messages from ourselves
-  if (event.source != window)
-    return;
-
-  if (event.data.type && (event.data.type == "FROM_PAGE")) {
-    if (localStorage.getItem(save_address) != null) {
-        queue = JSON.parse(localStorage[save_address]);
-    }
-    insertButton();
-    console.log(window.queue);
-    console.log(event.data.text);
-    if (event.data.text == "pop") {
-        window.queue.shift();
-        localStorage[save_address] = JSON.stringify(window.queue);
-    }
-  }
-}, false);
-
 
 chrome.runtime.onMessage.addListener(function (msg, sender, response) {
   // First, validate the message's structure

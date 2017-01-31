@@ -6,6 +6,7 @@ function run_now() {
 }
 run_now();
 var link = "nothing";
+var save_address = 'songs_queue';
 
 function onPlayerStateChanged(newState) {
 // -1 (unstarted)
@@ -14,10 +15,15 @@ function onPlayerStateChanged(newState) {
 // 2 (paused)
 // 3 (buffering)
 // 5 (video cued).
-    window.postMessage({ type: "FROM_PAGE", text: newState }, "*");
-    if (newState == 0 && link != "nothing") {
-        window.postMessage({ type: "FROM_PAGE", text: "pop" }, "*");
-        window.open(link,"_self");
+	var queue;
+	if (localStorage.getItem(save_address) != null) {
+        queue = JSON.parse(localStorage[save_address]);
     }
+	if (queue && newState == 0) {
+		window.open(queue[0][0],"_self");
+		queue.shift();
+		localStorage[save_address] = JSON.stringify(queue);
+	}
+	// console.log(localStorage);
 }
 
