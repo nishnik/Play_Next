@@ -22,7 +22,6 @@ insert_main();
 insertButton();
 
 function insertButton() {
-    document.getElementById("playNext_a").addEventListener("click", clickHandler);
     var to_match = 'a[class="';
     var LOC_HREF = 0;
     if (document.location.href == "https://www.youtube.com/") {
@@ -47,9 +46,11 @@ function insertButton() {
         for (var i = download_links.length-1; i >=buttons.length ; --i) {
             var link = download_links[i];
             var p = document.createElement('p');
-            p.innerHTML = '<a id ="playNext_a"><i>Play Next</i></a>';
+            p.innerHTML = '<a><i>Play Next</i></a>';
             p.className = "button play-next";
+            p.querySelector('a').addEventListener('click',clickHandler,true);
             link.parentElement.insertAdjacentElement('afterbegin',p);
+            p.dataset.inQueue = "0";
             p.dataset.name = link.href;
             if (LOC_HREF == 2)
                 p.dataset.song_name = link.querySelectorAll('span[class="title"]')[0].innerText;
@@ -67,7 +68,9 @@ function insertPlayInfo() {
         tmp = tmp.concat('"');
         var next_song = document.querySelectorAll(tmp);
         if (next_song.length > 0) {
-            next_song[0].innerHTML = '<a id ="playNext_a" style="color: blue"><i>Playing Next</i></a>';
+            next_song[0].innerHTML = '<a style="color: blue"><i>Playing Next</i></a>';
+            next_song[0].dataset.inQueue = "1";
+            next_song[0].querySelector('a').addEventListener('click',clickHandler,true);
         }
         for (var i = 1; i < window.queue.length; ++i) {
             tmp = 'p[data-name="';
@@ -75,10 +78,12 @@ function insertPlayInfo() {
             tmp = tmp.concat('"');
             var que_song = document.querySelectorAll(tmp);
             if (que_song.length > 0) {
-                var tmp = '<a id ="playNext_a" style="color: blue"><i>In Queue at #';
+                var tmp = '<a style="color: blue"><i>In Queue at #';
                 tmp = tmp.concat((i+1).toString(), '</i></a>');
                 que_song[0].innerHTML = tmp;
-            }      
+                que_song[0].dataset.inQueue = "1";
+                que_song[0].querySelector('a').addEventListener('click',clickHandler,true);
+            }
         }
         // TODO: change the next button icon
         // var next_button = document.querySelectorAll('a[class="ytp-next-button ytp-button"]');
@@ -95,23 +100,33 @@ function insertPlayInfo() {
 function clickHandler(e){
     // update queue
     if (localStorage.getItem(save_address) != null) {
-        queue = JSON.parse(localStorage[save_address]);
+        window.queue = JSON.parse(localStorage[save_address]);
     }
-    if (this.parentNode.innerHTML == '<a id ="playNext_a"><i>Play Next</i></a>') {
-        console.log("in here1");
+    if (window.queue.length == 0) {
+        console.log("case 0");
+        window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name]);
+    }
+    else if (this.parentNode.dataset.inQueue == "0") {
+        console.log("case 1");
         window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name]);
     }
     else {
-        console.log("in here");
+        console.log("case 2");
         var i = 0;
-        for (i = 0; i <= window.queue.length; ++i) {
+        for (i = 0; i < window.queue.length; ++i) {
             if (window.queue[i][0] == this.parentNode.dataset.name)
                 break;
         }
         console.log(window.queue, i);
         window.queue.splice(i, 1);
         console.log(window.queue);
-        this.parentNode.innerHTML = '<a id ="playNext_a"><i>Play Next</i></a>';
+        this.parentNode.dataset.inQueue = "0";
+        // small hack. TODO: fix this
+        this.parentNode.innerHTML = '<a class="add_event_hack"><i>Play Next</i></a>';
+        var tmp = document.getElementsByClassName("add_event_hack");
+        for (var i = 0; i < tmp.length; ++i) {
+            tmp[i].addEventListener('click', clickHandler, false);
+        }
     }
     localStorage[save_address] = JSON.stringify(window.queue);
     insertPlayInfo();
