@@ -38,4 +38,23 @@ You can add songs sequentially while remove songs from anywhere and would :heart
 ![play_nn](https://cloud.githubusercontent.com/assets/9252491/23092792/937fb812-f5f8-11e6-950e-9e8379917ea5.png)<br/>
 ### :) Happy songs listening.<br/>
 
+# Adding songs from another tab
+
+### Suppose you are listening to a song:<br/>
+![play_n1](https://cloud.githubusercontent.com/assets/9252491/23100825/d0e89c5c-f6af-11e6-941e-d8e635596b2a.png)<br/>
+### And you want that some other song plays after this, so you open a new tab:<br/>
+![play_n2](https://cloud.githubusercontent.com/assets/9252491/23100826/d11a4824-f6af-11e6-9933-c1a3d056ddbb.png)<br/>
+### And search for the song:<br/>
+![play_n3](https://cloud.githubusercontent.com/assets/9252491/23100827/d11ae568-f6af-11e6-8652-5442134759f7.png)<br/>
+### You want to play this song:<br/>
+![play_ n4](https://cloud.githubusercontent.com/assets/9252491/23100832/d2628890-f6af-11e6-9f36-89a6acae5750.png)<br/>
+### Just click on the 'Play Next' link:<br/>
+![play_n44](https://cloud.githubusercontent.com/assets/9252491/23100831/d184a520-f6af-11e6-9b4a-003407f44bbe.png)<br/>
+### After the current song ends in the initial tab:<br>
+![play_n5](https://cloud.githubusercontent.com/assets/9252491/23100830/d173e55a-f6af-11e6-935c-1acf9546cafa.png)<br/>
+### The song you have searched for will play:<br/>
+![play_n6](https://cloud.githubusercontent.com/assets/9252491/23100829/d17166e0-f6af-11e6-9529-d84881c66b91.png)<br/>
+
+
+
 This is still in developmental phase. Feel free to contribute.
