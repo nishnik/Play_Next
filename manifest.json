@@ -20,7 +20,8 @@
     {
       "matches": ["*://*.youtube.com/*"],
       "css": ["src/inject/inject.css"],
-      "js": ["src/inject/inject.js"]
+      "js": ["src/inject/inject.js"],
+      "run_at": "document_end"
     }
  ],
   "web_accessible_resources": [

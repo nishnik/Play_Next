@@ -17,43 +17,48 @@ if (localStorage.getItem(save_address) != null) {
     queue = JSON.parse(localStorage[save_address]);
 }
 
-insert_main();
-// At the very start add the buttons
-insertButton();
 
-function insertButton() {
+function checkLink() {
     var to_match = 'a[class="';
     var LOC_HREF = 0;
     if (document.location.href == "https://www.youtube.com/") {
-        to_match = to_match.concat(" yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+        to_match = to_match.concat("yt-simple-endpoint style-scope ytd-grid-video-renderer", '"]');
         LOC_HREF = 1;
     }
     else if (document.location.href.substring(0, 29) == "https://www.youtube.com/watch") {
-        to_match = to_match.concat(" content-link spf-link  yt-uix-sessionlink      spf-link ", '"]');
+        to_match = to_match.concat("yt-simple-endpoint style-scope ytd-compact-video-renderer", '"]');
         LOC_HREF = 2;
     }
-    else if (document.location.href.substring(0, 31) == "https://www.youtube.com/results") {
-        to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+    else if (document.location.href.substring(0, 31) == "https://www.youtube.com/results" || document.location.href == "https://www.youtube.com/feed/trending") {
+        to_match = to_match.concat("yt-simple-endpoint style-scope ytd-video-renderer", '"]');
         LOC_HREF = 3;
     }
-    else if (document.location.href == "https://www.youtube.com/feed/trending") {
-        to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
-        LOC_HREF = 4;
-    }
+    return [to_match, LOC_HREF];
+}
+
+function insertButton() {
+    temp = checkLink();
+    to_match = temp[0];
+    LOC_HREF = temp[1];
     var buttons = document.querySelectorAll('p[class="button play-next"]');
+    console.log(to_match);
     var download_links = document.querySelectorAll(to_match);
+    console.log("here");
+    console.log(download_links, buttons.length);
     if(download_links.length != buttons.length){
         for (var i = download_links.length-1; i >=buttons.length ; --i) {
+            // if (!download_links[i].className == "yt-simple-endpoint style-scope ytd-compact-video-renderer")
+            //     continue
             var link = download_links[i];
             var p = document.createElement('p');
             p.innerHTML = '<a><i>Play Next</i></a>';
             p.className = "button play-next";
             p.querySelector('a').addEventListener('click',clickHandler,true);
-            link.parentElement.insertAdjacentElement('afterbegin',p);
+            link.parentElement.insertAdjacentElement('afterend',p);
             p.dataset.inQueue = "0";
             p.dataset.name = link.href;
             if (LOC_HREF == 2)
-                p.dataset.song_name = link.querySelectorAll('span[class="title"]')[0].innerText;
+                p.dataset.song_name = link.querySelectorAll('span[id="video-title"]')[0].innerText;
             if (LOC_HREF == 1 || LOC_HREF == 3 || LOC_HREF == 4)
                 p.dataset.song_name = link.innerText;
         }
@@ -156,4 +161,19 @@ document.addEventListener("spfdone", process);
 function process() {
     insert_main();
     insertButton();
+}
+
+window.addEventListener ("load", myMain, false);
+// Small hack to inject code after the elements are loaded
+function myMain (evt) {
+    var jsInitChecktimer = setInterval (checkForJS_Finish, 111);
+
+    function checkForJS_Finish () {
+        to_match = checkLink()[0];
+        if (document.querySelectorAll(to_match).length >= 9) { // 9 is arbitrary
+            clearInterval (jsInitChecktimer);
+            insert_main();
+            insertButton();
+        }
+    }
 }
