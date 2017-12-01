@@ -40,6 +40,10 @@ function insertButton() {
         to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
         LOC_HREF = 4;
     }
+    else if (document.location.href == "https://www.youtube.com/feed/channels") {
+        to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+        LOC_HREF = 5;
+    }
     var buttons = document.querySelectorAll('p[class="button play-next"]');
     var download_links = document.querySelectorAll(to_match);
     if(download_links.length != buttons.length){
