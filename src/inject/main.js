@@ -24,6 +24,6 @@ function onPlayerStateChanged(newState) {
 		queue.shift();
 		localStorage[save_address] = JSON.stringify(queue);
 	}
-	// console.log(localStorage);
+	
 }
 
