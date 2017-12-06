@@ -10,7 +10,11 @@ function insert_main() {
         document.documentElement.appendChild(s)
     })(window.document);
 }
-
+var fileref = document.createElement("link");//linked css file
+fileref.rel = "stylesheet";
+fileref.type = "text/css";
+fileref.href = "inject.css";
+document.getElementsByTagName("head")[0].appendChild(fileref)
 var queue = [];
 var save_address = 'songs_queue';
 if (localStorage.getItem(save_address) != null) {
