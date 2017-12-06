@@ -10,7 +10,7 @@ function insert_main() {
         document.documentElement.appendChild(s)
     })(window.document);
 }
-var fileref = document.createElement("link");//linked css file
+var fileref = document.createElement("link");//linked css file inject.css
 fileref.rel = "stylesheet";
 fileref.type = "text/css";
 fileref.href = "inject.css";
