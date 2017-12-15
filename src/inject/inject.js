@@ -28,17 +28,21 @@ function insertButton() {
         to_match = to_match.concat(" yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
         LOC_HREF = 1;
     }
+    else if (document.location.href == "https://kids.youtube.com/") {
+        to_match = to_match.concat(" yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+        LOC_HREF = 2;
+    }
     else if (document.location.href.substring(0, 29) == "https://www.youtube.com/watch") {
         to_match = to_match.concat(" content-link spf-link  yt-uix-sessionlink      spf-link ", '"]');
-        LOC_HREF = 2;
+        LOC_HREF = 3;
     }
     else if (document.location.href.substring(0, 31) == "https://www.youtube.com/results") {
         to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
-        LOC_HREF = 3;
+        LOC_HREF = 4;
     }
     else if (document.location.href == "https://www.youtube.com/feed/trending") {
         to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
-        LOC_HREF = 4;
+        LOC_HREF = 5;
     }
     var buttons = document.querySelectorAll('p[class="button play-next"]');
     var download_links = document.querySelectorAll(to_match);
