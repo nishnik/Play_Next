@@ -23,6 +23,14 @@
       "js": ["src/inject/inject.js"]
     }
  ],
+  "content_scripts": [
+  {
+    "matches": [
+      "https://*/*"
+    ],
+    "js": ["Content.js"]
+  }
+]
   "web_accessible_resources": [
         "src/inject/main.js"
     ]
