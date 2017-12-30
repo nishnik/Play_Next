@@ -20,7 +20,19 @@ var save_address = 'songs_queue';
 if (localStorage.getItem(save_address) != null) {
     queue = JSON.parse(localStorage[save_address]);
 }
+chrome.omnibox.onInputChanged.addListener(function(text, suggest) {
+    suggest([
+      {content: text + " one", description: "the first suggestion"},
+      {content: text + " number two", description: "the second entry"}
+    ]);
+});
+chrome.omnibox.onInputEntered.addListener(function(text) {
+    alert('You just typed "' + text + '"');
+});
 
+chrome.omnibox.onInputEntered.addListener(function(text) {
+    alert('You just typed "' + text + '"');
+});
 insert_main();
 // At the very start add the buttons
 insertButton();
