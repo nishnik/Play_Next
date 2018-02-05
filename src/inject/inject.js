@@ -23,22 +23,26 @@ insertButton();
 
 function insertButton() {
     var to_match = 'a[class="';
-    var LOC_HREF = 0;
+    var PAGE_TYPE = 0;
     if (document.location.href == "https://www.youtube.com/") {
         to_match = to_match.concat(" yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
-        LOC_HREF = 1;
+        PAGE_TYPE = 1;
     }
     else if (document.location.href.substring(0, 29) == "https://www.youtube.com/watch") {
         to_match = to_match.concat(" content-link spf-link  yt-uix-sessionlink      spf-link ", '"]');
-        LOC_HREF = 2;
+        PAGE_TYPE = 2;
     }
     else if (document.location.href.substring(0, 31) == "https://www.youtube.com/results") {
         to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
-        LOC_HREF = 3;
+        PAGE_TYPE = 1;
     }
     else if (document.location.href == "https://www.youtube.com/feed/trending") {
         to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
-        LOC_HREF = 4;
+        PAGE_TYPE = 1;
+    }
+    else if (document.location.href.substring(0, 31) == "https://www.youtube.com/channel") {
+        to_match = to_match.concat("yt-uix-sessionlink yt-uix-tile-link  spf-link  yt-ui-ellipsis yt-ui-ellipsis-2", '"]');
+        PAGE_TYPE = 1;
     }
     var buttons = document.querySelectorAll('p[class="button play-next"]');
     var download_links = document.querySelectorAll(to_match);
@@ -52,9 +56,9 @@ function insertButton() {
             link.parentElement.insertAdjacentElement('afterbegin',p);
             p.dataset.inQueue = "0";
             p.dataset.name = link.href;
-            if (LOC_HREF == 2)
+            if (PAGE_TYPE == 2)
                 p.dataset.song_name = link.querySelectorAll('span[class="title"]')[0].innerText;
-            if (LOC_HREF == 1 || LOC_HREF == 3 || LOC_HREF == 4)
+            else if (PAGE_TYPE == 1)
                 p.dataset.song_name = link.innerText;
         }
     }
