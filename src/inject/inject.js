@@ -21,7 +21,7 @@ insert_main();
 // At the very start add the buttons
 insertButton();
 
-function insertButton() {
+function insertButton(refresh = false) {
     var to_match = 'a[class="';
     var PAGE_TYPE = 0;
     if (document.location.href == "https://www.youtube.com/") {
@@ -46,20 +46,26 @@ function insertButton() {
     }
     var buttons = document.querySelectorAll('p[class="button play-next"]');
     var download_links = document.querySelectorAll(to_match);
-    if(download_links.length != buttons.length){
-        for (var i = download_links.length-1; i >=buttons.length ; --i) {
+    if(download_links.length != buttons.length || true){
+        var refresh_till = buttons.length;
+        if (refresh)
+            refresh_till = 0;
+        for (var i = download_links.length-1; i >=refresh_till ; --i) {
             var link = download_links[i];
             var p = document.createElement('p');
             p.innerHTML = '<a><i>Play Next</i></a>';
             p.className = "button play-next";
             p.querySelector('a').addEventListener('click',clickHandler,true);
-            link.parentElement.insertAdjacentElement('afterbegin',p);
             p.dataset.inQueue = "0";
             p.dataset.name = link.href;
             if (PAGE_TYPE == 2)
                 p.dataset.song_name = link.querySelectorAll('span[class="title"]')[0].innerText;
             else if (PAGE_TYPE == 1)
                 p.dataset.song_name = link.innerText;
+            if (refresh)
+                link.parentElement.querySelector("p").remove();
+            link.parentElement.insertAdjacentElement('afterbegin',p);
+
         }
     }
     insertPlayInfo();
@@ -142,17 +148,50 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     if (localStorage.getItem(save_address) != null) {
         window.queue = JSON.parse(localStorage[save_address]);
     }
-    insert_main();
-    insertButton();
-
     var domInfo = " ";
     for (var i = 0; i < window.queue.length; ++i) {
-        domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", window.queue[i][1], "</a><br/><br/>");
+        domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
     }
+
+    insert_main();
+    insertButton();
     // Directly respond to the sender (popup), 
     // through the specified callback */
     response(domInfo);
   }
+  else if ((msg.from === 'popup') && (msg.subject === 'delete')) {
+    console.log(msg.to_del);
+    if (localStorage.getItem(save_address) != null) {
+        window.queue = JSON.parse(localStorage[save_address]);
+    }
+    var i = 0;
+    console.log(window.queue);
+    for (i = 0; i < window.queue.length; ++i) {
+        if (window.queue[i][0] == msg.to_del)
+            break;
+    }
+    window.queue.splice(i, 1);
+    localStorage[save_address] = JSON.stringify(window.queue);
+    // this.parentNode.dataset.inQueue = "0";
+    // // small hack. TODO: fix this
+    // this.parentNode.innerHTML = '<a class="add_event_hack"><i>Play Next</i></a>';
+    // var tmp = document.getElementsByClassName("add_event_hack");
+    // for (var i = 0; i < tmp.length; ++i) {
+    //     tmp[i].addEventListener('click', clickHandler, false);
+    // }
+
+    var domInfo = " ";
+    for (var i = 0; i < window.queue.length; ++i) {
+        domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
+    }
+
+    insert_main();
+    insertButton(true);
+    // Directly respond to the sender (popup), 
+    // through the specified callback */
+    response(domInfo);
+  }
+
 });
 
 // YouTube specific transition
