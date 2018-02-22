@@ -9,6 +9,7 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "omnibox": { "keyword" : "playlist" },
   "browser_action": {
     "default_popup": "popup.html"
   },
@@ -23,6 +24,14 @@
       "js": ["src/inject/inject.js"]
     }
  ],
+  "content_scripts": [
+  {
+    "matches": [
+      "https://*/*"
+    ],
+    "js": ["Content.js"]
+  }
+]
   "web_accessible_resources": [
         "src/inject/main.js"
     ]

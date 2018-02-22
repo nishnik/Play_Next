@@ -10,13 +10,29 @@ function insert_main() {
         document.documentElement.appendChild(s)
     })(window.document);
 }
-
+var fileref = document.createElement("link");//linked css file inject.css
+fileref.rel = "stylesheet";
+fileref.type = "text/css";
+fileref.href = "inject.css";
+document.getElementsByTagName("head")[0].appendChild(fileref)
 var queue = [];
 var save_address = 'songs_queue';
 if (localStorage.getItem(save_address) != null) {
     queue = JSON.parse(localStorage[save_address]);
 }
+chrome.omnibox.onInputChanged.addListener(function(text, suggest) {
+    suggest([
+      {content: text + " one", description: "the first suggestion"},
+      {content: text + " number two", description: "the second entry"}
+    ]);
+});
+chrome.omnibox.onInputEntered.addListener(function(text) {
+    alert('You just typed "' + text + '"');
+});
 
+chrome.omnibox.onInputEntered.addListener(function(text) {
+    alert('You just typed "' + text + '"');
+});
 insert_main();
 // At the very start add the buttons
 insertButton();
@@ -43,6 +59,10 @@ function insertButton(refresh = false) {
     else if (document.location.href.substring(0, 31) == "https://www.youtube.com/channel") {
         to_match = to_match.concat("yt-uix-sessionlink yt-uix-tile-link  spf-link  yt-ui-ellipsis yt-ui-ellipsis-2", '"]');
         PAGE_TYPE = 1;
+    }
+    else if (document.location.href == "https://www.youtube.com/feed/channels") {
+        to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+        LOC_HREF = 5;
     }
     var buttons = document.querySelectorAll('p[class="button play-next"]');
     var download_links = document.querySelectorAll(to_match);

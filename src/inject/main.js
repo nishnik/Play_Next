@@ -2,7 +2,7 @@ function run_now() {
 	if (player == document.getElementById('movie_player'))
 		return;
 	player = document.getElementById('movie_player');
-	player.addEventListener("onStateChange", "onPlayerStateChanged");
+	player.addEventListener("onStateChange", "onPlayerStateChanged");//'onStateChange': self.YTonStateChange.bind(self) can we use this to bind the video an call with 'this' keyword
 }
 run_now();
 var link = "nothing";
@@ -24,6 +24,6 @@ function onPlayerStateChanged(newState) {
 		queue.shift();
 		localStorage[save_address] = JSON.stringify(queue);
 	}
-	// console.log(localStorage);
+	
 }
 
