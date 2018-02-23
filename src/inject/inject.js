@@ -53,7 +53,7 @@ function insertButton(refresh = false) {
         for (var i = download_links.length-1; i >=refresh_till ; --i) {
             var link = download_links[i];
             var p = document.createElement('p');
-            p.innerHTML = '<a><i>Play Next</i></a>';
+            p.innerHTML = '<a><span class="play-next-button">Play Next</span></a>';
             p.className = "button play-next";
             p.querySelector('a').addEventListener('click',clickHandler,true);
             p.dataset.inQueue = "0";
@@ -78,7 +78,7 @@ function insertPlayInfo() {
         tmp = tmp.concat('"');
         var next_song = document.querySelectorAll(tmp);
         if (next_song.length > 0) {
-            next_song[0].innerHTML = '<a style="color: blue"><i>Playing Next</i></a>';
+            next_song[0].innerHTML = '<a><span class="playing-next-button">Playing Next</span></a>';
             next_song[0].dataset.inQueue = "1";
             next_song[0].querySelector('a').addEventListener('click',clickHandler,true);
         }
@@ -88,8 +88,8 @@ function insertPlayInfo() {
             tmp = tmp.concat('"');
             var que_song = document.querySelectorAll(tmp);
             if (que_song.length > 0) {
-                var tmp = '<a style="color: blue"><i>In Queue at #';
-                tmp = tmp.concat((i+1).toString(), '</i></a>');
+                var tmp = '<a><span class="playing-next-button">In Queue at #';
+                tmp = tmp.concat((i+1).toString(), '</span></a>');
                 que_song[0].innerHTML = tmp;
                 que_song[0].dataset.inQueue = "1";
                 que_song[0].querySelector('a').addEventListener('click',clickHandler,true);
@@ -132,7 +132,7 @@ function clickHandler(e){
         console.log(window.queue);
         this.parentNode.dataset.inQueue = "0";
         // small hack. TODO: fix this
-        this.parentNode.innerHTML = '<a class="add_event_hack"><i>Play Next</i></a>';
+        this.parentNode.innerHTML = '<a class="add_event_hack"><span class="play-next-button">Play Next</span></a>';
         var tmp = document.getElementsByClassName("add_event_hack");
         for (var i = 0; i < tmp.length; ++i) {
             tmp[i].addEventListener('click', clickHandler, false);

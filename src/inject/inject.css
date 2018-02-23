@@ -6,3 +6,22 @@
 	margin-bottom: 11px !important;
     /*add !important to make sure our button gets the styles we want 
 }*/
+.play-next-button{
+	padding: 2px;
+	background: #e74c3c;
+	line-height: 2;
+	padding-left: 4px;
+	padding-right: 4px;
+	color: white;
+	border-radius: 2px;
+}
+
+.playing-next-button{
+	padding: 2px;
+	background: #3498db;
+	line-height: 2;
+	padding-left: 4px;
+	padding-right: 4px;
+	color: white;
+	border-radius: 2px;
+}
