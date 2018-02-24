@@ -16,7 +16,6 @@ var save_address = 'songs_queue';
 if (localStorage.getItem(save_address) != null) {
     queue = JSON.parse(localStorage[save_address]);
 }
-
 insert_main();
 // At the very start add the buttons
 insertButton();
@@ -148,6 +147,7 @@ function writeToDOM() {
     for (var i = 0; i < window.queue.length; ++i) {
         domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<button id='", window.queue[i][0],"' class='moveUp'> Move Up</button>", "<button id='", window.queue[i][0],"' class='moveDown'> Move Down</button>", "<br/><br/>");
     }
+    domInfo = domInfo.concat("<br> <button id='generate' class='generate'> Generate Playlist</button>");
     return domInfo;
 }
 
@@ -209,13 +209,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
         window.queue[i-1] = temp;
     }
     localStorage[save_address] = JSON.stringify(window.queue);
-    // this.parentNode.dataset.inQueue = "0";
-    // // small hack. TODO: fix this
-    // this.parentNode.innerHTML = '<a class="add_event_hack"><i>Play Next</i></a>';
-    // var tmp = document.getElementsByClassName("add_event_hack");
-    // for (var i = 0; i < tmp.length; ++i) {
-    //     tmp[i].addEventListener('click', clickHandler, false);
-    // }
+
     var domInfo = writeToDOM();
     insert_main();
     insertButton(true);
@@ -240,13 +234,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
         window.queue[i+1] = temp;
     }
     localStorage[save_address] = JSON.stringify(window.queue);
-    // this.parentNode.dataset.inQueue = "0";
-    // // small hack. TODO: fix this
-    // this.parentNode.innerHTML = '<a class="add_event_hack"><i>Play Next</i></a>';
-    // var tmp = document.getElementsByClassName("add_event_hack");
-    // for (var i = 0; i < tmp.length; ++i) {
-    //     tmp[i].addEventListener('click', clickHandler, false);
-    // }
+
     var domInfo = writeToDOM();
     insert_main();
     insertButton(true);
@@ -254,6 +242,24 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     // through the specified callback */
     response(domInfo);
   }
+  else if ((msg.from === 'popup') && (msg.subject === 'generate')) {
+    console.log(msg.to_apply);
+    if (localStorage.getItem(save_address) != null) {
+        window.queue = JSON.parse(localStorage[save_address]);
+    }
+    var i = 0;
+    console.log(window.queue);
+    var playlist="https://www.youtube.com/embed/?playlist=";
+    for (i = 0; i < window.queue.length; ++i) {
+        playlist = playlist.concat(window.queue[i][0].slice(32) + ",");
+    }
+    window.open(playlist);
+    var domInfo = writeToDOM();
+    // Directly respond to the sender (popup), 
+    // through the specified callback */
+    response(domInfo);
+  }
+  
 
 });
 
