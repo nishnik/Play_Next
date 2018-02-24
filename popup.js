@@ -1,9 +1,9 @@
 
 function setDOMInfo(info) {
   document.getElementById('content').innerHTML = info;
-  var dds = document.getElementsByClassName("del");
+  var dds = document.getElementsByTagName("button");
   for (var i = 0, l = dds.length; l > i; i++)
-    dds[i].onclick = delete_event(dds[i]);
+    dds[i].onclick = apply_event(dds[i]);
   }
 
 // Once the DOM is ready...
@@ -23,7 +23,7 @@ window.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-var delete_event = function(dd) {
+var apply_event = function(dd) {
   return function() {
       chrome.tabs.query({
     active: true,
@@ -32,7 +32,7 @@ var delete_event = function(dd) {
     // ...and send a request for the DOM info...
     chrome.tabs.sendMessage(
         tabs[0].id,
-        {from: 'popup', subject: 'delete', to_del:dd.id},
+        {from: 'popup', subject: dd.className, to_apply:dd.id},
         // ...also specifying a callback to be called 
         //    from the receiving end (content script)
         setDOMInfo);

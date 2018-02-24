@@ -46,7 +46,8 @@ function insertButton(refresh = false) {
     }
     var buttons = document.querySelectorAll('p[class="button play-next"]');
     var download_links = document.querySelectorAll(to_match);
-    if(download_links.length != buttons.length || true){
+    // we don't need to add buttons if already added or if we don't refresh
+    if(download_links.length != buttons.length || refresh){
         var refresh_till = buttons.length;
         if (refresh)
             refresh_till = 0;
@@ -142,16 +143,21 @@ function clickHandler(e){
     insertPlayInfo();
 }
 
+function writeToDOM() {
+    var domInfo = " ";
+    for (var i = 0; i < window.queue.length; ++i) {
+        domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<button id='", window.queue[i][0],"' class='moveUp'> Move Up</button>", "<button id='", window.queue[i][0],"' class='moveDown'> Move Down</button>", "<br/><br/>");
+    }
+    return domInfo;
+}
+
 chrome.runtime.onMessage.addListener(function (msg, sender, response) {
   // First, validate the message's structure
   if ((msg.from === 'popup') && (msg.subject === 'DOMInfo')) {
     if (localStorage.getItem(save_address) != null) {
         window.queue = JSON.parse(localStorage[save_address]);
     }
-    var domInfo = " ";
-    for (var i = 0; i < window.queue.length; ++i) {
-        domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
-    }
+    var domInfo = writeToDOM();
 
     insert_main();
     insertButton();
@@ -160,14 +166,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     response(domInfo);
   }
   else if ((msg.from === 'popup') && (msg.subject === 'delete')) {
-    console.log(msg.to_del);
+    console.log(msg.to_apply);
     if (localStorage.getItem(save_address) != null) {
         window.queue = JSON.parse(localStorage[save_address]);
     }
     var i = 0;
     console.log(window.queue);
     for (i = 0; i < window.queue.length; ++i) {
-        if (window.queue[i][0] == msg.to_del)
+        if (window.queue[i][0] == msg.to_apply)
             break;
     }
     window.queue.splice(i, 1);
@@ -179,12 +185,69 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     // for (var i = 0; i < tmp.length; ++i) {
     //     tmp[i].addEventListener('click', clickHandler, false);
     // }
-
-    var domInfo = " ";
-    for (var i = 0; i < window.queue.length; ++i) {
-        domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
+    var domInfo = writeToDOM();
+    insert_main();
+    insertButton(true);
+    // Directly respond to the sender (popup), 
+    // through the specified callback */
+    response(domInfo);
+  }
+  else if ((msg.from === 'popup') && (msg.subject === 'moveUp')) {
+    console.log(msg.to_apply);
+    if (localStorage.getItem(save_address) != null) {
+        window.queue = JSON.parse(localStorage[save_address]);
     }
-
+    var i = 0;
+    console.log(window.queue);
+    for (i = 0; i < window.queue.length; ++i) {
+        if (window.queue[i][0] == msg.to_apply)
+            break;
+    }
+    if (i != 0) {
+        var temp = window.queue[i];
+        window.queue[i] = window.queue[i-1];
+        window.queue[i-1] = temp;
+    }
+    localStorage[save_address] = JSON.stringify(window.queue);
+    // this.parentNode.dataset.inQueue = "0";
+    // // small hack. TODO: fix this
+    // this.parentNode.innerHTML = '<a class="add_event_hack"><i>Play Next</i></a>';
+    // var tmp = document.getElementsByClassName("add_event_hack");
+    // for (var i = 0; i < tmp.length; ++i) {
+    //     tmp[i].addEventListener('click', clickHandler, false);
+    // }
+    var domInfo = writeToDOM();
+    insert_main();
+    insertButton(true);
+    // Directly respond to the sender (popup), 
+    // through the specified callback */
+    response(domInfo);
+  }
+  else if ((msg.from === 'popup') && (msg.subject === 'moveDown')) {
+    console.log(msg.to_apply);
+    if (localStorage.getItem(save_address) != null) {
+        window.queue = JSON.parse(localStorage[save_address]);
+    }
+    var i = 0;
+    console.log(window.queue);
+    for (i = 0; i < window.queue.length; ++i) {
+        if (window.queue[i][0] == msg.to_apply)
+            break;
+    }
+    if (i != window.queue.length-1) {
+        var temp = window.queue[i];
+        window.queue[i] = window.queue[i+1];
+        window.queue[i+1] = temp;
+    }
+    localStorage[save_address] = JSON.stringify(window.queue);
+    // this.parentNode.dataset.inQueue = "0";
+    // // small hack. TODO: fix this
+    // this.parentNode.innerHTML = '<a class="add_event_hack"><i>Play Next</i></a>';
+    // var tmp = document.getElementsByClassName("add_event_hack");
+    // for (var i = 0; i < tmp.length; ++i) {
+    //     tmp[i].addEventListener('click', clickHandler, false);
+    // }
+    var domInfo = writeToDOM();
     insert_main();
     insertButton(true);
     // Directly respond to the sender (popup), 
