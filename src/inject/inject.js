@@ -58,10 +58,20 @@ function insertButton(refresh = false) {
             p.querySelector('a').addEventListener('click',clickHandler,true);
             p.dataset.inQueue = "0";
             p.dataset.name = link.href;
-            if (PAGE_TYPE == 2)
+            if (PAGE_TYPE == 2){
                 p.dataset.song_name = link.querySelectorAll('span[class="title"]')[0].innerText;
-            else if (PAGE_TYPE == 1)
+                p.dataset.channel_name = link.querySelectorAll('span[class="stat attribution"]')[0].innerText
+                p.dataset.image_url = "https://i.ytimg.com/vi/"+link.href.split("=")[1]+"/hqdefault.jpg"
+                //p.dataset.song_name = link.parentElement.nextElementSibling.children[0].children[0].children[0].src;
+                //p.dataset.image_url = document.querySelectorAll('img[aria-hidden="true"]')[0].src;
+
+            }
+            else if (PAGE_TYPE == 1){
                 p.dataset.song_name = link.innerText;
+                p.dataset.channel_name = link.parentElement.nextSibling.innerHTML;
+                p.dataset.image_url = "https://i.ytimg.com/vi/"+link.href.split("=")[1]+"/hqdefault.jpg"
+                //p.dataset.image_url = document.querySelectorAll('img[aria-hidden="true"]')[0].src;
+            }
             if (refresh)
                 link.parentElement.querySelector("p").remove();
             link.parentElement.insertAdjacentElement('afterbegin',p);
@@ -114,11 +124,11 @@ function clickHandler(e){
     }
     if (window.queue.length == 0) {
         console.log("case 0");
-        window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name]);
+        window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name, this.parentNode.dataset.channel_name, this.parentNode.dataset.image_url]);
     }
     else if (this.parentNode.dataset.inQueue == "0") {
         console.log("case 1");
-        window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name]);
+        window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name, this.parentNode.dataset.channel_name, this.parentNode.dataset.image_url]);
     }
     else {
         console.log("case 2");
@@ -128,7 +138,7 @@ function clickHandler(e){
                 break;
         }
         console.log(window.queue, i);
-        window.queue.splice(i, 1);
+        window.queue.splice(i, 1); 
         console.log(window.queue);
         this.parentNode.dataset.inQueue = "0";
         // small hack. TODO: fix this
@@ -150,7 +160,16 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     }
     var domInfo = " ";
     for (var i = 0; i < window.queue.length; ++i) {
-        domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
+        var img = '<img class="popup-image" src=' + window.queue[i][3] + '>'
+        var title = '<a class="popup-title" href="'+window.queue[i][0]+'">['+i+'] ' + window.queue[i][1] + '</a>'
+        var channel = '<p class="popup-channel">' + window.queue[i][2] + '</p>'
+        var del = "<button id='" + window.queue[i][0] +"' class='del'>Remove</button>"
+        var img_part = '<div class="img-part">' + img + '</div>'
+        var text_part = '<div class="text-part">' + title + channel + del +'</div>'
+        //var del_part = '<div class="del-part">' + del + '</div>'
+
+        //domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
+        domInfo = domInfo.concat('<div class="popup-card">', img_part, text_part, '</div> <hr>');
     }
 
     insert_main();
@@ -182,7 +201,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 
     var domInfo = " ";
     for (var i = 0; i < window.queue.length; ++i) {
-        domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
+        //domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
+        var img = '<img class="popup-image" src=' + window.queue[i][3] + '>'
+        var title = '<a class="popup-title" href="'+window.queue[i][0]+'">['+i+'] ' + window.queue[i][1] + '</a>'
+        var channel = '<p class="popup-channel">' + window.queue[i][2] + '</p>'
+        var del = "<button id='" + window.queue[i][0] +"' class='del'>Remove</button>"
+        var img_part = '<div class="img-part">' + img + '</div>'
+        var text_part = '<div class="text-part">' + title + channel + del +'</div>'
+        domInfo = domInfo.concat('<div class="popup-card">', img_part, text_part, '</div> <hr>');
     }
 
     insert_main();
