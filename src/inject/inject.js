@@ -168,7 +168,7 @@ function writeToDOM() {
     if (window.queue.length > 0)
         domInfo = domInfo.concat("<br> <button id='generate' class='generate'> Generate Playlist</button>");
     else
-        domInfo = "Building stuff is good, building stuff which you yourself use is awesome. Keep building, keep innovating!"
+        domInfo = "Building stuff is good, building stuff which you yourself use is awesome. Keep building, keep innovating! <br/> Add videos to the queue to get started."
     return domInfo;
 }
 

@@ -1,6 +1,7 @@
 
 function setDOMInfo(info) {
-  document.getElementById('content').innerHTML = info;
+  if (info != null)
+    document.getElementById('content').innerHTML = info;
   var dds = document.getElementsByTagName("button");
   for (var i = 0, l = dds.length; l > i; i++)
     dds[i].onclick = apply_event(dds[i]);
