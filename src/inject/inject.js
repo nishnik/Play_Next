@@ -58,10 +58,20 @@ function insertButton(refresh = false) {
             p.querySelector('a').addEventListener('click',clickHandler,true);
             p.dataset.inQueue = "0";
             p.dataset.name = link.href;
-            if (PAGE_TYPE == 2)
+            if (PAGE_TYPE == 2){
                 p.dataset.song_name = link.querySelectorAll('span[class="title"]')[0].innerText;
-            else if (PAGE_TYPE == 1)
+                p.dataset.channel_name = link.querySelectorAll('span[class="stat attribution"]')[0].innerText
+                p.dataset.image_url = "https://i.ytimg.com/vi/"+link.href.split("=")[1]+"/hqdefault.jpg"
+                //p.dataset.song_name = link.parentElement.nextElementSibling.children[0].children[0].children[0].src;
+                //p.dataset.image_url = document.querySelectorAll('img[aria-hidden="true"]')[0].src;
+
+            }
+            else if (PAGE_TYPE == 1){
                 p.dataset.song_name = link.innerText;
+                p.dataset.channel_name = link.parentElement.nextSibling.innerHTML;
+                p.dataset.image_url = "https://i.ytimg.com/vi/"+link.href.split("=")[1]+"/hqdefault.jpg"
+                //p.dataset.image_url = document.querySelectorAll('img[aria-hidden="true"]')[0].src;
+            }
             if (refresh)
                 link.parentElement.querySelector("p").remove();
             link.parentElement.insertAdjacentElement('afterbegin',p);
@@ -114,11 +124,11 @@ function clickHandler(e){
     }
     if (window.queue.length == 0) {
         console.log("case 0");
-        window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name]);
+        window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name, this.parentNode.dataset.channel_name, this.parentNode.dataset.image_url]);
     }
     else if (this.parentNode.dataset.inQueue == "0") {
         console.log("case 1");
-        window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name]);
+        window.queue.push([this.parentNode.dataset.name, this.parentNode.dataset.song_name, this.parentNode.dataset.channel_name, this.parentNode.dataset.image_url]);
     }
     else {
         console.log("case 2");
@@ -128,7 +138,7 @@ function clickHandler(e){
                 break;
         }
         console.log(window.queue, i);
-        window.queue.splice(i, 1);
+        window.queue.splice(i, 1); 
         console.log(window.queue);
         this.parentNode.dataset.inQueue = "0";
         // small hack. TODO: fix this
@@ -145,9 +155,21 @@ function clickHandler(e){
 function writeToDOM() {
     var domInfo = " ";
     for (var i = 0; i < window.queue.length; ++i) {
-        domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<button id='", window.queue[i][0],"' class='moveUp'> Move Up</button>", "<button id='", window.queue[i][0],"' class='moveDown'> Move Down</button>", "<br/><br/>");
+        var img = '<img class="popup-image" src=' + window.queue[i][3] + '>'
+        var title = '<a class="popup-title" href="'+window.queue[i][0]+'">['+i+'] ' + window.queue[i][1] + '</a>'
+        var channel = '<p class="popup-channel">' + window.queue[i][2] + '</p>'
+        var del = "<button id='" + window.queue[i][0] +"' class='delete'>Remove</button>"
+        var img_part = '<div class="img-part">' + img + '</div>'
+        var text_part = '<div class="text-part">' + title + channel + del +'</div>'
+        //var del_part = '<div class="del-part">' + del + '</div>'
+
+        //domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
+        domInfo = domInfo.concat('<div class="popup-card">', img_part, text_part, '</div> <hr>');
     }
-    domInfo = domInfo.concat("<br> <button id='generate' class='generate'> Generate Playlist</button>");
+    // for (var i = 0; i < window.queue.length; ++i) {
+    //     domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<button id='", window.queue[i][0],"' class='moveUp'> Move Up</button>", "<button id='", window.queue[i][0],"' class='moveDown'> Move Down</button>", "<br/><br/>");
+    // }
+    // domInfo = domInfo.concat("<br> <button id='generate' class='generate'> Generate Playlist</button>");
     return domInfo;
 }
 
@@ -158,7 +180,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
         window.queue = JSON.parse(localStorage[save_address]);
     }
     var domInfo = writeToDOM();
-
     insert_main();
     insertButton();
     // Directly respond to the sender (popup), 
@@ -192,73 +213,85 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     // through the specified callback */
     response(domInfo);
   }
-  else if ((msg.from === 'popup') && (msg.subject === 'moveUp')) {
-    console.log(msg.to_apply);
-    if (localStorage.getItem(save_address) != null) {
-        window.queue = JSON.parse(localStorage[save_address]);
-    }
-    var i = 0;
-    console.log(window.queue);
-    for (i = 0; i < window.queue.length; ++i) {
-        if (window.queue[i][0] == msg.to_apply)
-            break;
-    }
-    if (i != 0) {
-        var temp = window.queue[i];
-        window.queue[i] = window.queue[i-1];
-        window.queue[i-1] = temp;
-    }
-    localStorage[save_address] = JSON.stringify(window.queue);
+//   else if ((msg.from === 'popup') && (msg.subject === 'moveUp')) {
+//     console.log(msg.to_apply);
+//     if (localStorage.getItem(save_address) != null) {
+//         window.queue = JSON.parse(localStorage[save_address]);
+//     }
+//     var i = 0;
+//     console.log(window.queue);
+//     for (i = 0; i < window.queue.length; ++i) {
+//         if (window.queue[i][0] == msg.to_apply)
+//             break;
+//     }
+//     if (i != 0) {
+//         var temp = window.queue[i];
+//         window.queue[i] = window.queue[i-1];
+//         window.queue[i-1] = temp;
+//     }
+//     localStorage[save_address] = JSON.stringify(window.queue);
 
-    var domInfo = writeToDOM();
-    insert_main();
-    insertButton(true);
-    // Directly respond to the sender (popup), 
-    // through the specified callback */
-    response(domInfo);
-  }
-  else if ((msg.from === 'popup') && (msg.subject === 'moveDown')) {
-    console.log(msg.to_apply);
-    if (localStorage.getItem(save_address) != null) {
-        window.queue = JSON.parse(localStorage[save_address]);
-    }
-    var i = 0;
-    console.log(window.queue);
-    for (i = 0; i < window.queue.length; ++i) {
-        if (window.queue[i][0] == msg.to_apply)
-            break;
-    }
-    if (i != window.queue.length-1) {
-        var temp = window.queue[i];
-        window.queue[i] = window.queue[i+1];
-        window.queue[i+1] = temp;
-    }
-    localStorage[save_address] = JSON.stringify(window.queue);
+//     var domInfo = writeToDOM();
+//     insert_main();
+//     insertButton(true);
+//     // Directly respond to the sender (popup), 
+//     // through the specified callback */
+//     response(domInfo);
+//   }
+//   else if ((msg.from === 'popup') && (msg.subject === 'moveDown')) {
+//     console.log(msg.to_apply);
+//     if (localStorage.getItem(save_address) != null) {
+//         window.queue = JSON.parse(localStorage[save_address]);
+//     }
+//     var i = 0;
+//     console.log(window.queue);
+//     for (i = 0; i < window.queue.length; ++i) {
+//         if (window.queue[i][0] == msg.to_apply)
+//             break;
+// =======
+//     var domInfo = " ";
+//     for (var i = 0; i < window.queue.length; ++i) {
+//         //domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
+//         var img = '<img class="popup-image" src=' + window.queue[i][3] + '>'
+//         var title = '<a class="popup-title" href="'+window.queue[i][0]+'">['+i+'] ' + window.queue[i][1] + '</a>'
+//         var channel = '<p class="popup-channel">' + window.queue[i][2] + '</p>'
+//         var del = "<button id='" + window.queue[i][0] +"' class='del'>Remove</button>"
+//         var img_part = '<div class="img-part">' + img + '</div>'
+//         var text_part = '<div class="text-part">' + title + channel + del +'</div>'
+//         domInfo = domInfo.concat('<div class="popup-card">', img_part, text_part, '</div> <hr>');
+// >>>>>>> f907cfd9cf9fe752e4284ad909017a3707663b65
+//     }
+//     if (i != window.queue.length-1) {
+//         var temp = window.queue[i];
+//         window.queue[i] = window.queue[i+1];
+//         window.queue[i+1] = temp;
+//     }
+//     localStorage[save_address] = JSON.stringify(window.queue);
 
-    var domInfo = writeToDOM();
-    insert_main();
-    insertButton(true);
-    // Directly respond to the sender (popup), 
-    // through the specified callback */
-    response(domInfo);
-  }
-  else if ((msg.from === 'popup') && (msg.subject === 'generate')) {
-    console.log(msg.to_apply);
-    if (localStorage.getItem(save_address) != null) {
-        window.queue = JSON.parse(localStorage[save_address]);
-    }
-    var i = 0;
-    console.log(window.queue);
-    var playlist="https://www.youtube.com/embed/?playlist=";
-    for (i = 0; i < window.queue.length; ++i) {
-        playlist = playlist.concat(window.queue[i][0].slice(32) + ",");
-    }
-    window.open(playlist);
-    var domInfo = writeToDOM();
-    // Directly respond to the sender (popup), 
-    // through the specified callback */
-    response(domInfo);
-  }
+//     var domInfo = writeToDOM();
+//     insert_main();
+//     insertButton(true);
+//     // Directly respond to the sender (popup), 
+//     // through the specified callback */
+//     response(domInfo);
+//   }
+//   else if ((msg.from === 'popup') && (msg.subject === 'generate')) {
+//     console.log(msg.to_apply);
+//     if (localStorage.getItem(save_address) != null) {
+//         window.queue = JSON.parse(localStorage[save_address]);
+//     }
+//     var i = 0;
+//     console.log(window.queue);
+//     var playlist="https://www.youtube.com/embed/?playlist=";
+//     for (i = 0; i < window.queue.length; ++i) {
+//         playlist = playlist.concat(window.queue[i][0].slice(32) + ",");
+//     }
+//     window.open(playlist);
+//     var domInfo = writeToDOM();
+//     // Directly respond to the sender (popup), 
+//     // through the specified callback */
+//     response(domInfo);
+//   }
   
 
 });
