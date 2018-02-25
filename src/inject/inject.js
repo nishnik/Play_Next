@@ -159,8 +159,10 @@ function writeToDOM() {
         var title = '<a class="popup-title" href="'+window.queue[i][0]+'">['+i+'] ' + window.queue[i][1] + '</a>'
         var channel = '<p class="popup-channel">' + window.queue[i][2] + '</p>'
         var del = "<button id='" + window.queue[i][0] +"' class='delete'>Remove</button>"
+        var moveUp = "<button id='" + window.queue[i][0] +"' class='moveUp'>Move Up</button>"
+        var moveDown = "<button id='" + window.queue[i][0] +"' class='moveDown'>Move Down</button>"
         var img_part = '<div class="img-part">' + img + '</div>'
-        var text_part = '<div class="text-part">' + title + channel + del +'</div>'
+        var text_part = '<div class="text-part">' + title + channel + del + moveUp + moveDown +'</div>'
         //var del_part = '<div class="del-part">' + del + '</div>'
 
         //domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
@@ -172,6 +174,7 @@ function writeToDOM() {
     // domInfo = domInfo.concat("<br> <button id='generate' class='generate'> Generate Playlist</button>");
     return domInfo;
 }
+
 
 chrome.runtime.onMessage.addListener(function (msg, sender, response) {
   // First, validate the message's structure
@@ -213,68 +216,56 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     // through the specified callback */
     response(domInfo);
   }
-//   else if ((msg.from === 'popup') && (msg.subject === 'moveUp')) {
-//     console.log(msg.to_apply);
-//     if (localStorage.getItem(save_address) != null) {
-//         window.queue = JSON.parse(localStorage[save_address]);
-//     }
-//     var i = 0;
-//     console.log(window.queue);
-//     for (i = 0; i < window.queue.length; ++i) {
-//         if (window.queue[i][0] == msg.to_apply)
-//             break;
-//     }
-//     if (i != 0) {
-//         var temp = window.queue[i];
-//         window.queue[i] = window.queue[i-1];
-//         window.queue[i-1] = temp;
-//     }
-//     localStorage[save_address] = JSON.stringify(window.queue);
+  else if ((msg.from === 'popup') && (msg.subject === 'moveUp')) {
+    console.log(msg.to_apply);
+    if (localStorage.getItem(save_address) != null) {
+        window.queue = JSON.parse(localStorage[save_address]);
+    }
+    var i = 0;
+    console.log(window.queue);
+    for (i = 0; i < window.queue.length; ++i) {
+        if (window.queue[i][0] == msg.to_apply)
+            break;
+    }
+    if (i != 0) {
+        var temp = window.queue[i];
+        window.queue[i] = window.queue[i-1];
+        window.queue[i-1] = temp;
+    }
+    localStorage[save_address] = JSON.stringify(window.queue);
 
-//     var domInfo = writeToDOM();
-//     insert_main();
-//     insertButton(true);
-//     // Directly respond to the sender (popup), 
-//     // through the specified callback */
-//     response(domInfo);
-//   }
-//   else if ((msg.from === 'popup') && (msg.subject === 'moveDown')) {
-//     console.log(msg.to_apply);
-//     if (localStorage.getItem(save_address) != null) {
-//         window.queue = JSON.parse(localStorage[save_address]);
-//     }
-//     var i = 0;
-//     console.log(window.queue);
-//     for (i = 0; i < window.queue.length; ++i) {
-//         if (window.queue[i][0] == msg.to_apply)
-//             break;
-// =======
-//     var domInfo = " ";
-//     for (var i = 0; i < window.queue.length; ++i) {
-//         //domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
-//         var img = '<img class="popup-image" src=' + window.queue[i][3] + '>'
-//         var title = '<a class="popup-title" href="'+window.queue[i][0]+'">['+i+'] ' + window.queue[i][1] + '</a>'
-//         var channel = '<p class="popup-channel">' + window.queue[i][2] + '</p>'
-//         var del = "<button id='" + window.queue[i][0] +"' class='del'>Remove</button>"
-//         var img_part = '<div class="img-part">' + img + '</div>'
-//         var text_part = '<div class="text-part">' + title + channel + del +'</div>'
-//         domInfo = domInfo.concat('<div class="popup-card">', img_part, text_part, '</div> <hr>');
-// >>>>>>> f907cfd9cf9fe752e4284ad909017a3707663b65
-//     }
-//     if (i != window.queue.length-1) {
-//         var temp = window.queue[i];
-//         window.queue[i] = window.queue[i+1];
-//         window.queue[i+1] = temp;
-//     }
-//     localStorage[save_address] = JSON.stringify(window.queue);
+    var domInfo = writeToDOM();
+    insert_main();
+    insertButton(true);
+    // Directly respond to the sender (popup), 
+    // through the specified callback */
+    response(domInfo);
+  }
+  else if ((msg.from === 'popup') && (msg.subject === 'moveDown')) {
+    console.log(msg.to_apply);
+    if (localStorage.getItem(save_address) != null) {
+        window.queue = JSON.parse(localStorage[save_address]);
+    }
+    var i = 0;
+    console.log(window.queue);
+    for (i = 0; i < window.queue.length; ++i) {
+        if (window.queue[i][0] == msg.to_apply)
+            break;
+    }
+    if (i != window.queue.length-1) {
+        var temp = window.queue[i];
+        window.queue[i] = window.queue[i+1];
+        window.queue[i+1] = temp;
+    }
+    localStorage[save_address] = JSON.stringify(window.queue);
 
-//     var domInfo = writeToDOM();
-//     insert_main();
-//     insertButton(true);
-//     // Directly respond to the sender (popup), 
-//     // through the specified callback */
-//     response(domInfo);
-//   }
+    var domInfo = writeToDOM();
+    insert_main();
+    insertButton(true);
+    // Directly respond to the sender (popup), 
+    // through the specified callback */
+    response(domInfo);
+  }
 //   else if ((msg.from === 'popup') && (msg.subject === 'generate')) {
 //     console.log(msg.to_apply);
 //     if (localStorage.getItem(save_address) != null) {
