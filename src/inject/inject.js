@@ -165,7 +165,10 @@ function writeToDOM() {
         var text_part = '<div class="text-part">' + title + channel + del + moveUp + moveDown +'</div>'
         domInfo = domInfo.concat('<div class="popup-card">', img_part, text_part, '</div> <hr>');
     }
-    domInfo = domInfo.concat("<br> <button id='generate' class='generate'> Generate Playlist</button>");
+    if (window.queue.length > 0)
+        domInfo = domInfo.concat("<br> <button id='generate' class='generate'> Generate Playlist</button>");
+    else
+        domInfo = "Building stuff is good, building stuff which you yourself use is awesome. Keep building, keep innovating!"
     return domInfo;
 }
 
@@ -176,8 +179,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
         window.queue = JSON.parse(localStorage[save_address]);
     }
     var domInfo = writeToDOM();
-    insert_main();
-    insertButton();
+    insert_main(); // depreceated; remove it; DOMNodeInserted handles this
+    insertButton(); // depreceated; remove it; DOMNodeInserted handles this
     response(domInfo);
   }
   else if ((msg.from === 'popup') && (msg.subject === 'delete')) {
@@ -194,7 +197,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     window.queue.splice(i, 1);
     localStorage[save_address] = JSON.stringify(window.queue);
     var domInfo = writeToDOM();
-    insert_main();
+    insert_main(); // depreceated; remove it; DOMNodeInserted handles this
     insertButton(true);
     response(domInfo);
   }
@@ -217,7 +220,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     localStorage[save_address] = JSON.stringify(window.queue);
 
     var domInfo = writeToDOM();
-    insert_main();
+    insert_main(); // depreceated; remove it; DOMNodeInserted handles this
     insertButton(true);
     response(domInfo);
   }
@@ -240,7 +243,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     localStorage[save_address] = JSON.stringify(window.queue);
 
     var domInfo = writeToDOM();
-    insert_main();
+    insert_main(); // depreceated; remove it; DOMNodeInserted handles this
     insertButton(true);
     response(domInfo);
   }
@@ -269,3 +272,9 @@ function process() {
     insert_main();
     insertButton();
 }
+
+document.body.addEventListener('DOMNodeInserted', function( event ) {
+    if (event.relatedNode.id == "watch-more-related" || event.relatedNode.id == "feed-main-what_to_watch") // watch-more-related for "/v?=*" and feed-main-what. for main page
+        insertButton();
+
+}, false);
