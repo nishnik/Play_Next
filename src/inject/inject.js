@@ -155,22 +155,16 @@ function clickHandler(e){
 function writeToDOM() {
     var domInfo = " ";
     for (var i = 0; i < window.queue.length; ++i) {
-        var img = '<img class="popup-image" src=' + window.queue[i][3] + '>'
-        var title = '<a class="popup-title" href="'+window.queue[i][0]+'">['+i+'] ' + window.queue[i][1] + '</a>'
+        var img = '<a href="'+window.queue[i][0]+'"target="_blank"><img class="popup-image" src=' + window.queue[i][3] + '></a>'
+        var title = '<a class="popup-title" href="'+window.queue[i][0]+'"target="_blank">['+(i+1)+'] ' + window.queue[i][1] + '</a>'
         var channel = '<p class="popup-channel">' + window.queue[i][2] + '</p>'
         var del = "<button id='" + window.queue[i][0] +"' class='delete'>Remove</button>"
         var moveUp = "<button id='" + window.queue[i][0] +"' class='moveUp'>Move Up</button>"
         var moveDown = "<button id='" + window.queue[i][0] +"' class='moveDown'>Move Down</button>"
         var img_part = '<div class="img-part">' + img + '</div>'
         var text_part = '<div class="text-part">' + title + channel + del + moveUp + moveDown +'</div>'
-        //var del_part = '<div class="del-part">' + del + '</div>'
-
-        //domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<br/><br/>");
         domInfo = domInfo.concat('<div class="popup-card">', img_part, text_part, '</div> <hr>');
     }
-    // for (var i = 0; i < window.queue.length; ++i) {
-    //     domInfo = domInfo.concat("<a href = '", window.queue[i][0], "'>", (i+1).toString(), ". ", window.queue[i][1], "</a>", "<button id='", window.queue[i][0],"' class='del'> Delete</button>", "<button id='", window.queue[i][0],"' class='moveUp'> Move Up</button>", "<button id='", window.queue[i][0],"' class='moveDown'> Move Down</button>", "<br/><br/>");
-    // }
     // domInfo = domInfo.concat("<br> <button id='generate' class='generate'> Generate Playlist</button>");
     return domInfo;
 }
