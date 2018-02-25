@@ -1,22 +1,74 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<script src = "popup.js"></script>
-</head>
-<style type="text/css">
-body {
-  min-width: 800px; /* your desired width */
-}
-</style>
 
-<body>
-<div id = "header">
-Playlist information:
-<br/>
-<br/>
-</div>
-<div id = "content">
-Good Day!
-</div>
-</body>
+	<head>
+	    <script src="popup.js"></script>
+	</head>
+	<style type="text/css">
+		body {
+		    min-width: 370px;
+		    max-height: 600px;
+		    overflow: scroll;
+		    /* your desired width */
+		}
+		#nav{
+			background: #c0392b;
+			color: white;
+			font-weight: 700;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			width: 100%;
+			padding: 10px;
+			border-radius: 2px;
+		}
+		#content{
+			margin-top: 40px;
+		}
+		.popup-card{
+			display: flex;
+			flex-direction: row;
+		}
+		.text-part{
+			padding: 10px;
+		}
+		.popup-title{
+			font-size: 15px;
+			font-weight: 500;
+			margin: 0px;
+			color: #333;
+			text-decoration: none;
+		}
+		.popup-channel{
+			color: #999999;
+			margin: 0px;
+			font-size: 10px;
+		}
+		.popup-image{
+			width: 120px;
+		}
+		.del{
+			border-radius: 3px;
+			width: 60px;
+			background: #c0392b;
+			text-align: center;
+			margin: 5px;
+			padding: 5px;
+			color: white;
+			pointer-events: cursor;
+		}
+		hr{
+			color: #eeeeee;
+    		border: #eeeeee 1px solid;
+    		border-width: 0.5px;
+		}
+	</style>
+
+	<body>
+		<div id="nav">Play Next</div>
+	    <div id="content">
+	        Good Day!
+	    </div>
+	</body>
+
 </html>
