@@ -13,8 +13,10 @@
     "default_popup": "popup.html"
   },
   "permissions": [
+    "cookies",
     "tabs",
-    "storage"
+    "storage",
+    "<all_urls>"
   ],
   "content_scripts": [
     {
