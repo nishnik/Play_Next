@@ -12,6 +12,7 @@ function insert_main() {
 }
 
 var queue = [];
+
 var save_address = 'songs_queue';
 if (localStorage.getItem(save_address) != null) {
     queue = JSON.parse(localStorage[save_address]);
@@ -21,27 +22,18 @@ insert_main();
 insertButton();
 
 function insertButton(refresh = false) {
+    
     var to_match = 'a[class="';
     var PAGE_TYPE = 0;
-    if (document.location.href == "https://www.youtube.com/") {
-        to_match = to_match.concat(" yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
+    if (document.location.href == "https://www.youtube.com/" || document.location.href.substring(0, 31) == "https://www.youtube.com/results"
+        || document.location.href == "https://www.youtube.com/feed/trending" || document.location.href.substring(0, 31) == "https://www.youtube.com/channel") {
+        to_match = 'a[id="video-title"]';
         PAGE_TYPE = 1;
     }
     else if (document.location.href.substring(0, 29) == "https://www.youtube.com/watch") {
-        to_match = to_match.concat(" content-link spf-link  yt-uix-sessionlink      spf-link ", '"]');
+        to_match = 'a[class="';
+        to_match = to_match.concat("yt-simple-endpoint style-scope ytd-compact-video-renderer", '"]');
         PAGE_TYPE = 2;
-    }
-    else if (document.location.href.substring(0, 31) == "https://www.youtube.com/results") {
-        to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
-        PAGE_TYPE = 1;
-    }
-    else if (document.location.href == "https://www.youtube.com/feed/trending") {
-        to_match = to_match.concat("yt-uix-tile-link yt-ui-ellipsis yt-ui-ellipsis-2 yt-uix-sessionlink      spf-link ", '"]');
-        PAGE_TYPE = 1;
-    }
-    else if (document.location.href.substring(0, 31) == "https://www.youtube.com/channel") {
-        to_match = to_match.concat("yt-uix-sessionlink yt-uix-tile-link  spf-link  yt-ui-ellipsis yt-ui-ellipsis-2", '"]');
-        PAGE_TYPE = 1;
     }
     var buttons = document.querySelectorAll('p[class="button play-next"]');
     var download_links = document.querySelectorAll(to_match);
@@ -59,23 +51,26 @@ function insertButton(refresh = false) {
             p.dataset.inQueue = "0";
             p.dataset.name = link.href;
             if (PAGE_TYPE == 2){
-                p.dataset.song_name = link.querySelectorAll('span[class="title"]')[0].innerText;
-                p.dataset.channel_name = link.querySelectorAll('span[class="stat attribution"]')[0].innerText
+                p.dataset.song_name = link.querySelectorAll('span[id="video-title"]')[0].innerText;
+                p.dataset.channel_name = link.querySelectorAll('yt-formatted-string[id="byline"]')[0].innerText
                 p.dataset.image_url = "https://i.ytimg.com/vi/"+link.href.split("=")[1]+"/hqdefault.jpg"
                 //p.dataset.song_name = link.parentElement.nextElementSibling.children[0].children[0].children[0].src;
                 //p.dataset.image_url = document.querySelectorAll('img[aria-hidden="true"]')[0].src;
-
+                prev = link.parentElement.querySelector("p");
+                if (prev)
+                    prev.remove();
+                link.parentElement.insertAdjacentElement('afterbegin',p);
             }
             else if (PAGE_TYPE == 1){
                 p.dataset.song_name = link.innerText;
-                p.dataset.channel_name = link.parentElement.nextSibling.innerHTML;
+                p.dataset.channel_name = link.parentElement.parentElement.parentElement.querySelector('div[id="byline-container"]').innerText;
                 p.dataset.image_url = "https://i.ytimg.com/vi/"+link.href.split("=")[1]+"/hqdefault.jpg"
                 //p.dataset.image_url = document.querySelectorAll('img[aria-hidden="true"]')[0].src;
+                prev = link.parentElement.querySelector("p");
+                if (prev)
+                    prev.remove();
+                link.parentElement.insertAdjacentElement('beforeend',p);
             }
-            if (refresh)
-                link.parentElement.querySelector("p").remove();
-            link.parentElement.insertAdjacentElement('afterbegin',p);
-
         }
     }
     insertPlayInfo();
@@ -178,6 +173,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     if (localStorage.getItem(save_address) != null) {
         window.queue = JSON.parse(localStorage[save_address]);
     }
+    console.log("called here in dominfo popup");
     var domInfo = writeToDOM();
     insert_main(); // depreceated; remove it; DOMNodeInserted handles this
     insertButton(); // depreceated; remove it; DOMNodeInserted handles this
@@ -274,7 +270,11 @@ function process() {
 }
 
 document.body.addEventListener('DOMNodeInserted', function( event ) {
-    if (event.relatedNode.id == "watch-more-related" || event.relatedNode.id == "feed-main-what_to_watch") // watch-more-related for "/v?=*" and feed-main-what. for main page
+    if (event.relatedNode.id == "play" || event.relatedNode.id == "overlays") // overlays for "/v?=*" and play for main page
+    {
         insertButton();
+    }
 
 }, false);
+
+

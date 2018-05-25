@@ -41,29 +41,3 @@ var apply_event = function(dd) {
 
   }
   };
-
-var tmp;
-function cookieinfo(){
-    chrome.cookies.get({name:"PREF", url:"https://www.youtube.com"},function (cookie){
-        var YT_COOKIE = cookie;
-        tmp = YT_COOKIE;
-        console.log(cookie);
-        modified_val = YT_COOKIE["value"]
-    index = modified_val.indexOf('4100') + 4
-        console.log(YT_COOKIE["value"])
-          modified_val = modified_val.substr(0, index) + '8' + modified_val.substr(index + 1);
-       console.log(modified_val, "old:",  YT_COOKIE["value"])
-     
- if (YT_COOKIE["value"][index] == '4') {
-          
-          chrome.cookies.set({ url: "https://www.youtube.com", name: "PREF", value:  modified_val,  expirationDate: YT_COOKIE["expirationDate"]});
-          console.log("Done");
-          chrome.tabs.getSelected(null, function(tab) {
-            var code = 'window.location.reload();';
-            chrome.tabs.executeScript(tab.id, {code: code});
-          });
-        }
-    });
-}
-cookieinfo()
-// window.onload=cookieinfo;
